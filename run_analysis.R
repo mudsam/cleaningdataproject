@@ -1,3 +1,46 @@
+###
+### Purpose
+### Merge, label and summarize the "UCI HAR Dataset"
+###
+### Pre-requisites
+### - The R code was developed and tested on "R version 3.1.2 (2014-10-31)"
+### - The working directory needs to set to the root of the "UCI HAR Dataset"
+###
+### Input
+### - The "UCI HAR Dataset" with the following directory structure
+###     activitiy_labels.txt
+###     features.txt
+###     train/
+###        subject_text.txt
+###        X_test.txt
+###        y_test.txt
+###     test/
+###        subject_train.txt
+###        X_train.txt
+###        y_train.txt
+###
+### Output
+### - A file named "tidy_df.txt" containting the tidy dataset will be created in the working directory
+### - The file format is space-separated with quoted character vectors
+### - The file has a header row describing the columns
+###
+### Logic
+### 1. Load reference data (activity_labels.txt and features.txt)
+### 2. Load and label test data set (subject_text.txt, X_test.txt and y_test.txt)
+###    - Feature labels based on features.txt
+### 3. Merge test data set into one dataframe
+### 4. Load and label training data set (subject_text.txt, X_test.txt and y_test.txt)
+###    - Feature labels based on features.txt
+### 5. Merge training data set into one dataframe
+### 6. Merge test and training data sets
+### 7. Label activities based on activity_labels.txt
+### 8. Filter features to keep only mean and SD measurements
+### 9. Create tidy dataframe by calculating mean of all features by subject and activity
+### 10. Prepend feature names with "mean_" to indicate that they are mean values
+### 11. Remove "()" and replace "-" with "_" in feature names to make them valid for R use
+### 12. Store tidy dataframe in "tidy_df.txt" file in working directory
+###
+
 ##
 ## Load reference data
 ##
@@ -51,12 +94,20 @@ complete_df$activity <- factor(complete_df$activity, levels=activity_labels_df$V
 # Keep columns subject_id, activity and any columns ending in "mean()" or "std()"
 complete_df <- complete_df[,grep("subject_id|activity|mean\\(\\)|std\\(\\)", names(complete_df), value = T)]
 
+
 ##
 ## Create tidy dataset
 ##
 
 # Create a new tidy dataframe that contains the mean for all features by subject_id and activity
 tidy_df <- aggregate(. ~ subject_id + activity, data=complete_df, mean)
+# Rename features by prepending "mean_" to indicate that all measurements are a mean value
+names(tidy_df) <- ifelse(names(tidy_df) %in% c("subject_id", "activity"),
+                         names(tidy_df),
+                         gsub("(.*)", "mean_\\1", names(tidy_df)))
+# Remove parenthesis and replace "-" with "_" to make the column names valid for R use
+names(tidy_df) <- gsub("\\(\\)", "", names(tidy_df))
+names(tidy_df) <- gsub("\\-", "\\_", names(tidy_df))
 
 # Write tidy dataset to disk
 # The file will contain column headers but now row names
