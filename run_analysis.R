@@ -1,10 +1,16 @@
 ###
 ### Purpose
 ### Merge, label and summarize the "UCI HAR Dataset"
+### The output contains the calculated mean by subject and activity of the means and standard deviations from the raw dataset.
 ###
 ### Pre-requisites
-### - The R code was developed and tested on "R version 3.1.2 (2014-10-31)"
+### - The R code was developed and tested on "R version 3.1.2 (2014-10-31)" on Max OS X 10.9, it has not been tested on any other configuration
 ### - The working directory needs to set to the root of the "UCI HAR Dataset"
+###
+### How to run
+### 1. Start R
+### 2. Set working directory to the root of the "UCI HAR Dataset"
+### 3. Source the run_analysis.R script###
 ###
 ### Input
 ### - The "UCI HAR Dataset" with the following directory structure
@@ -111,5 +117,5 @@ names(tidy_df) <- gsub("\\-", "\\_", names(tidy_df))
 
 # Write tidy dataset to disk
 # The file will contain column headers but now row names
-write.table(tidy_df, "tidy_df.txt", row.names=F)
+write.table(tidy_df, file = "tidy_df.txt", row.names=F)
 
